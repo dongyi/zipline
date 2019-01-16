@@ -40,6 +40,25 @@ client.Order.Order_cancelAll().result()
 
 """
 
+class BitmexWS:
+    def __init__(self, symbol, api_key, api_secret):
+        self.symbol = symbol
+        self.ws = None
+        self.last_orderbook = {}
+        self.ws_callback = None
+        self.api_key = api_key
+        self.api_secret = api_secret
+
+    def start_connect(self):
+        self.ws = BitMEXWebsocket(endpoint=WS_ENTRY, symbol=self.symbol, api_key=self.api_key,
+                                  api_secret=self.api_secret)
+
+    def get_recent_trades(self):
+        return self.ws.recent_trades()
+
+    def get_open_orders(self):
+        return self.ws.open_orders()
+
 
 class BITMEXBroker(Broker):
 
@@ -48,8 +67,7 @@ class BITMEXBroker(Broker):
         self.api_key = os.environ.get('bitmex_api_key')
         self.api_secret = os.environ.get('bitmex_api_secret')
         endpoint = TEST_WS_ENTRY if is_test else WS_ENTRY
-        self.ws_client = BitmexWS(endpoint=endpoint,
-                                  symbol='XBTUSD',
+        self.ws_client = BitmexWS(symbol='XBTUSD',
                                   api_key=self.api_key,
                                   api_secret=self.api_secret)
         self.api_client = bitmex.bitmex(is_test, None, self.api_key, self.api_secret)
