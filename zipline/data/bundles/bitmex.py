@@ -192,30 +192,32 @@ def create_bundle(asset_pairs, start=None, end=None):
         minute_bar_writer.write(data, show_progress=show_progress)
     return ingest
 
+def main():
+    register_calendar('BITMEX', AlwaysOpenCalendar())
+    # The following is necessary because zipline's developer hard-coded NYSE
+    # everywhere in run_algo._run, *DOH*!!!
+    deregister_calendar('NYSE')
+    register_calendar_alias('NYSE', 'BITMEX', force=False)
+    register(
+        'bitmex',
+        create_bundle(
+            [
+                Pairs.symbol_btc,
+                #Pairs.symbol_ada,
+                #Pairs.symbol_bch,
+                #Pairs.symbol_eos,
+                #Pairs.symbol_eth,
+                #Pairs.symbol_ltc,
+                #Pairs.symbol_trx,
+                #Pairs.symbol_xrp,
+            ],
+            pd.Timestamp('2017-11-05 00:00:00', tz='utc'),
+            pd.Timestamp('2018-12-18 23:59:59', tz='utc'),
+        ),
+        calendar_name='BITMEX',
+        minutes_per_day=24*60
+    )
 
-register_calendar('BITMEX', AlwaysOpenCalendar())
-# The following is necessary because zipline's developer hard-coded NYSE
-# everywhere in run_algo._run, *DOH*!!!
-deregister_calendar('NYSE')
-register_calendar_alias('NYSE', 'BITMEX', force=False)
-register(
-    'bitmex',
-    create_bundle(
-        [
-            Pairs.symbol_btc,
-            #Pairs.symbol_ada,
-            #Pairs.symbol_bch,
-            #Pairs.symbol_eos,
-            #Pairs.symbol_eth,
-            #Pairs.symbol_ltc,
-            #Pairs.symbol_trx,
-            #Pairs.symbol_xrp,
-        ],
-        pd.Timestamp('2017-11-05 00:00:00', tz='utc'),
-        pd.Timestamp('2018-12-18 23:59:59', tz='utc'),
-    ),
-    calendar_name='BITMEX',
-    minutes_per_day=24*60
-)
 
-
+if __name__ == '__main__':
+    main()

@@ -266,22 +266,24 @@ def create_bundle(asset_pairs, start, end):
     return ingest
 
 
-register_calendar('CN_FUTURES', CN_FUTURE_CALENDAR(), force=True)
+def main():
+    register_calendar('CN_FUTURES', CN_FUTURE_CALENDAR(), force=True)
 
-deregister_calendar('NYSE')
+    deregister_calendar('NYSE')
 
-register_calendar_alias('NYSE', 'CN_FUTURES', force=True)
+    register_calendar_alias('NYSE', 'CN_FUTURES', force=True)
 
-register(
-    'CN_FUTURES',
-    create_bundle(
-        ['IC', 'IH', 'IF', 'RB'],
-        pd.Timestamp('2017-09-20 01:31:00', tz='utc'),
-        pd.Timestamp('2018-10-31 01:31:00', tz='utc'),
-    ),
-    calendar_name='CN_FUTURES',
-    minutes_per_day=4 * 60 + 90
-)
+    register(
+        'CN_FUTURES',
+        create_bundle(
+            ['IC', 'IH', 'IF', 'RB'],
+            pd.Timestamp('2017-09-20 01:31:00', tz='utc'),
+            pd.Timestamp('2018-10-31 01:31:00', tz='utc'),
+        ),
+        calendar_name='CN_FUTURES',
+        minutes_per_day=4 * 60 + 90
+    )
+
 
 if __name__ == '__main__':
-    pass
+    main()
