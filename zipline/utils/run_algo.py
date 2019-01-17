@@ -24,7 +24,7 @@ from zipline.algorithm_live import LiveTradingAlgorithm
 from zipline.data.bundles.core import load
 from zipline.data.data_portal import DataPortal
 from zipline.data.data_portal_live import DataPortalLive
-from zipline.finance.trading import TradingEnvironment
+
 from zipline.pipeline.data import USEquityPricing
 from zipline.pipeline.loaders import USEquityPricingLoader
 from zipline.utils.calendars import get_calendar
@@ -139,7 +139,7 @@ def _run(handle_data,
                 "invalid url %r, must begin with 'sqlite:///'" %
                 str(bundle_data.asset_finder.engine.url),
             )
-        env = TradingEnvironment(asset_db_path=connstr, environ=environ)
+
         first_trading_day =\
             bundle_data.equity_minute_bar_reader.first_trading_day
 
@@ -147,7 +147,7 @@ def _run(handle_data,
                            if broker
                            else DataPortal)
         data = DataPortalClass(
-            env.asset_finder, get_calendar("NYSE"),
+            bundle_data.asset_finder, get_calendar("NYSE"),
             first_trading_day=first_trading_day,
             equity_minute_reader=bundle_data.equity_minute_bar_reader,
             equity_daily_reader=bundle_data.equity_daily_bar_reader,
@@ -166,7 +166,6 @@ def _run(handle_data,
                 "No PipelineLoader registered for column %s." % column
             )
     else:
-        env = TradingEnvironment(environ=environ)
         choose_loader = None
 
     emission_rate = 'daily'
@@ -183,7 +182,6 @@ def _run(handle_data,
 
     perf = TradingAlgorithmClass(
         namespace=namespace,
-        env=env,
         get_pipeline_loader=choose_loader,
         sim_params=create_simulation_parameters(
             start=start,
