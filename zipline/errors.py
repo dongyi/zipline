@@ -858,3 +858,10 @@ class IncompatibleTerms(ZiplineError):
         "{term_1} and {term_2} must have the same mask in order to compute "
         "correlations and regressions asset-wise."
     )
+
+class ScheduleFunctionOutsideTradingStart(ZiplineError):
+    """
+    Raised when an algorithm schedules functions outside of
+    before_trading_start()
+    """
+    msg = "schedule_function() should only be called in before_trading_start()"
