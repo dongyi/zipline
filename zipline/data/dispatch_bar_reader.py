@@ -52,7 +52,7 @@ class AssetDispatchBarReader(with_metaclass(ABCMeta)):
         self._last_available_dt = last_available_dt
 
         for t, r in iteritems(self._readers):
-            assert trading_calendar == r.trading_calendar, \
+            assert type(trading_calendar) == type(r.trading_calendar), \
                 "All readers must share target trading_calendar. " \
                 "Reader={0} for type={1} uses calendar={2} which does not " \
                 "match the desired shared calendar={3} ".format(
