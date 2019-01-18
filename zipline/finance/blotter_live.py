@@ -110,3 +110,6 @@ class BlotterLive(Blotter):
     def process_splits(self, splits):
         # Splits are handled at the broker
         pass
+
+    def cancel_all_orders_for_asset(self, *args, **kwargs):
+        pass
