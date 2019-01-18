@@ -16,7 +16,6 @@ asset_db_table_names = frozenset({
     'equity_symbol_mappings',
     'equity_supplementary_mappings',
     'futures_contracts',
-    'exchanges',
     'futures_root_symbols',
     'version_info',
 })
