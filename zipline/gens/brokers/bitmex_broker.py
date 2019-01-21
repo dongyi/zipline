@@ -70,6 +70,7 @@ class BITMEXBroker(Broker):
         self.ws_client = BitmexWS(symbol='XBTUSD',
                                   api_key=self.api_key,
                                   api_secret=self.api_secret)
+        self.ws_client.start_connect()
         self.api_client = bitmex.bitmex(is_test, None, self.api_key, self.api_secret)
 
     def _new_order_id(self):
@@ -236,7 +237,7 @@ class BITMEXBroker(Broker):
         else:
             symbols = [asset.symbol for asset in assets]
         if field in ('price', 'last_traded'):
-            quotes = self.api_client.Quote.Quote_get(symbols)
+            quotes = self.ws_client.ws.get_history(symbols[0])
             if assets_is_scalar:
                 if field == 'price':
                     if len(quotes) == 0:
@@ -252,7 +253,7 @@ class BITMEXBroker(Broker):
                     for quote in quotes
                 ]
 
-        bars_list = self.api_client.Quote.Quote_get(symbols)
+        bars_list = self.ws_client.ws.get_history(symbols[0])
         if assets_is_scalar:
             if len(bars_list) == 0:
                 return np.nan
