@@ -515,6 +515,7 @@ class TradingAlgorithm(object):
         )
 
     def _create_benchmark_source(self):
+        self.benchmark_sid = 0
         if self.benchmark_sid is not None:
             benchmark_asset = self.asset_finder.retrieve_asset(
                 self.benchmark_sid
