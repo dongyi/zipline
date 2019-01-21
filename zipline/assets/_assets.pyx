@@ -53,7 +53,6 @@ cdef class Asset:
 
     def __init__(self,
                  int64_t sid, # sid is required
-                 object exchange_info, # exchange is required
                  object symbol="",
                  object asset_name="",
                  object start_date=None,
@@ -66,7 +65,7 @@ cdef class Asset:
         self.sid = sid
         self.symbol = symbol
         self.asset_name = asset_name
-        self.exchange_info = exchange_info
+        self.exchange_info = None
         self.start_date = start_date
         self.end_date = end_date
         self.first_traded = first_traded
@@ -76,15 +75,15 @@ cdef class Asset:
 
     @property
     def exchange(self):
-        return self.exchange_info.canonical_name
+        return ""#self.exchange_info.canonical_name
 
     @property
     def exchange_full(self):
-        return self.exchange_info.name
+        return ""#self.exchange_info.name
 
     @property
     def country_code(self):
-        return self.exchange_info.country_code
+        return ""#self.exchange_info.country_code
 
     def __int__(self):
         return self.sid
@@ -145,7 +144,6 @@ cdef class Asset:
         be serialized/deserialized during pickling.
         """
         return (self.__class__, (self.sid,
-                                 self.exchange_info,
                                  self.symbol,
                                  self.asset_name,
                                  self.start_date,
@@ -272,7 +270,6 @@ cdef class Future(Asset):
 
     def __init__(self,
                  int64_t sid, # sid is required
-                 object exchange_info, # exchange is required
                  object symbol="",
                  object root_symbol="",
                  object asset_name="",
@@ -287,7 +284,6 @@ cdef class Future(Asset):
 
         super().__init__(
             sid,
-            exchange_info,
             symbol=symbol,
             asset_name=asset_name,
             start_date=start_date,
@@ -328,7 +324,6 @@ cdef class Future(Asset):
         be serialized/deserialized during pickling.
         """
         return (self.__class__, (self.sid,
-                                 self.exchange_info,
                                  self.symbol,
                                  self.root_symbol,
                                  self.asset_name,

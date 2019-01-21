@@ -642,6 +642,7 @@ class AssetFinder(object):
 
         if querying_equities:
             def mkdict(row,
+                       exchanges='',
                        symbols=self._lookup_most_recent_symbols(sids)):
                 return merge(row, symbols[row['sid']])
         else:
