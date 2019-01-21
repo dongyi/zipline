@@ -53,7 +53,6 @@ def coerce_string_to_conn(require_exists):
     )
 
 
-def coerce_string_to_eng(require_exists):
-    return coerce_string(
-        partial(check_and_create_engine, require_exists=require_exists)
-    )
+coerce_string_to_eng = coerce_string(
+    lambda s: sa.create_engine('sqlite:///' + s)
+)
