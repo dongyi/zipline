@@ -254,6 +254,7 @@ class TradingAlgorithm(object):
         # set_benchmark.
         self.data_portal = data_portal
         engine = create_engine('sqlite:///' + ':memory:')
+        AssetDBWriter(engine).init_db()
         self.asset_finder = AssetFinder(engine, future_chain_predicates=CHAIN_PREDICATES)
 
         self.benchmark_returns = benchmark_returns
