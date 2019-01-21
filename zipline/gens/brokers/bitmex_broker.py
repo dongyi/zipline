@@ -252,7 +252,7 @@ class BITMEXBroker(Broker):
                     for quote in quotes
                 ]
 
-        bars_list = self.api_client.Quote.Quote_get(symbols, count=1)
+        bars_list = self.api_client.Quote.Quote_get(symbols)
         if assets_is_scalar:
             if len(bars_list) == 0:
                 return np.nan
@@ -272,7 +272,7 @@ class BITMEXBroker(Broker):
             symbols = [asset.symbol for asset in assets]
         timeframe = '1D' if is_daily else '1Min'
 
-        bars_list = self.api_client.Quote.Quote_get(symbols, count=500)
+        bars_list = self.api_client.Quote.Quote_get(symbols)
         bars_map = {a.symbol: a for a in bars_list}
         dfs = []
         for asset in assets if not assets_is_scalar else [assets]:
