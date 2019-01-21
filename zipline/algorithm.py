@@ -108,6 +108,8 @@ from zipline.utils.numpy_utils import int64_dtype
 from zipline.utils.pandas_utils import normalize_date
 from zipline.utils.cache import ExpiringCache
 from zipline.utils.pandas_utils import clear_dataframe_indexer_caches
+from zipline.assets import AssetDBWriter, AssetFinder
+from sqlalchemy import create_engine
 
 import zipline.utils.events
 from zipline.utils.events import (
@@ -132,6 +134,7 @@ from zipline.sources.requests_csv import PandasRequestsCSV
 from zipline.gens.sim_engine import MinuteSimulationClock
 from zipline.sources.benchmark_source import BenchmarkSource
 from zipline.zipline_warnings import ZiplineDeprecationWarning
+from zipline.assets.continuous_futures import CHAIN_PREDICATES
 
 
 log = logbook.Logger("ZiplineLog")
@@ -250,23 +253,8 @@ class TradingAlgorithm(object):
         # finder earlier than that to look up assets for things like
         # set_benchmark.
         self.data_portal = data_portal
-
-        if self.data_portal is None:
-            if asset_finder is None:
-                raise ValueError(
-                    "Must pass either data_portal or asset_finder "
-                    "to TradingAlgorithm()"
-                )
-            self.asset_finder = asset_finder
-        else:
-            # Raise an error if we were passed two different asset finders.
-            # There's no world where that's a good idea.
-            if asset_finder is not None \
-               and asset_finder is not data_portal.asset_finder:
-                raise ValueError(
-                    "Inconsistent asset_finders in TradingAlgorithm()"
-                )
-            self.asset_finder = data_portal.asset_finder
+        engine = create_engine('sqlite:///' + ':memory:')
+        self.asset_finder = AssetFinder(engine, future_chain_predicates=CHAIN_PREDICATES)
 
         self.benchmark_returns = benchmark_returns
 
