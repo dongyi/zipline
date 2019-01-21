@@ -809,7 +809,7 @@ class AssetFinder(object):
             options=[self.retrieve_asset(s) for s in sid_keys],
         )
 
-    def lookup_symbol(self, symbol, as_of_date, fuzzy=False):
+    def lookup_symbol(self, symbol, as_of_date, fuzzy=False, country_code=None):
         """Lookup an equity by symbol.
 
         Parameters
