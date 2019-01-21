@@ -61,7 +61,7 @@ def alter_columns(op, name, *columns, **kwargs):
     op.drop_table(tmp_name)
 
 
-@preprocess(engine=coerce_string_to_eng(require_exists=True))
+@preprocess(engine=coerce_string_to_eng)
 def downgrade(engine, desired_version):
     """Downgrades the assets db at the given engine to the desired version.
 
