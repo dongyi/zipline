@@ -48,7 +48,6 @@ cdef class Asset:
         'auto_close_date',
         'tick_size',
         'multiplier',
-        'exchange_info',
     })
 
     def __init__(self,
@@ -65,7 +64,6 @@ cdef class Asset:
         self.sid = sid
         self.symbol = symbol
         self.asset_name = asset_name
-        self.exchange_info = None
         self.start_date = start_date
         self.end_date = end_date
         self.first_traded = first_traded
@@ -169,7 +167,6 @@ cdef class Asset:
             'exchange_full': self.exchange_full,
             'tick_size': self.tick_size,
             'multiplier': self.price_multiplier,
-            'exchange_info': self.exchange_info,
         }
 
     @classmethod
@@ -263,7 +260,6 @@ cdef class Future(Asset):
         'expiration_date',
         'auto_close_date',
         'first_traded',
-        'exchange_info',
         'tick_size',
         'multiplier',
     })
