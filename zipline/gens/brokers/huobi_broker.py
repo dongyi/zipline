@@ -114,7 +114,7 @@ def createSign(pParams, method, host_url, request_path, secret_key):
 
 class HUOBIBroker(Broker):
 
-    def __init__(self):
+    def __init__(self, uri):
         self.__url = URL
 
         self.__access_key = os.environ.get('bitmex_api_key')
