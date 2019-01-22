@@ -5,7 +5,6 @@ from collections import defaultdict, OrderedDict
 import bitmex
 import numpy as np
 import pandas as pd
-from bitmex_websocket import BitMEXWebsocket
 
 import zipline.protocol as zp
 from zipline.api import symbol as symbol_lookup
@@ -14,7 +13,7 @@ from zipline.finance.order import (Order as ZPOrder,
                                    ORDER_STATUS as ZP_ORDER_STATUS)
 from zipline.finance.transaction import Transaction
 from zipline.gens.brokers.broker import Broker
-
+from zipline.gens.brokers.bitmex_ws_client import BitMEXWebsocket
 TEST_WS_ENTRY = 'wss://testnet.bitmex.com/realtime'
 WS_ENTRY = 'wss://www.bitmex.com/realtime'
 
@@ -40,21 +39,25 @@ client.Order.Order_cancelAll().result()
 
 """
 
+
 class BitmexWS:
-    def __init__(self, symbol, api_key, api_secret):
+    def __init__(self, symbol, api_key, api_secret, endpoint):
         self.symbol = symbol
         self.ws = None
         self.last_orderbook = {}
         self.ws_callback = None
         self.api_key = api_key
         self.api_secret = api_secret
+        self.endpoint = endpoint
+        self.start_connect()
 
     def start_connect(self):
-        self.ws = BitMEXWebsocket(endpoint=WS_ENTRY, symbol=self.symbol, api_key=self.api_key,
-                                  api_secret=self.api_secret)
+        self.ws = BitMEXWebsocket(endpoint=self.endpoint, api_key=self.api_key, api_secret=self.api_secret)
 
-    def get_recent_trades(self):
-        return self.ws.recent_trades()
+    def get_recent_trades(self, symbol='XBTUSD'):
+        recent_trades = self.ws.recent_trades()
+        print(recent_trades)
+        return recent_trades
 
     def get_open_orders(self):
         return self.ws.open_orders()
@@ -66,11 +69,10 @@ class BITMEXBroker(Broker):
         is_test = os.environ.get('is_test') == 'true'
         self.api_key = os.environ.get('bitmex_api_key')
         self.api_secret = os.environ.get('bitmex_api_secret')
-        endpoint = TEST_WS_ENTRY if is_test else WS_ENTRY
+        self.endpoint = TEST_WS_ENTRY if is_test else WS_ENTRY
         self.ws_client = BitmexWS(symbol='XBTUSD',
                                   api_key=self.api_key,
                                   api_secret=self.api_secret)
-        self.ws_client.start_connect()
         self.api_client = bitmex.bitmex(is_test, None, self.api_key, self.api_secret)
 
     def _new_order_id(self):
@@ -237,7 +239,7 @@ class BITMEXBroker(Broker):
         else:
             symbols = [asset.symbol for asset in assets]
         if field in ('price', 'last_traded'):
-            quotes = self.ws_client.ws.get_history(symbols[0])
+            quotes = self.ws_client.ws.get_recent_trades(symbols[0])
             if assets_is_scalar:
                 if field == 'price':
                     if len(quotes) == 0:
@@ -253,7 +255,7 @@ class BITMEXBroker(Broker):
                     for quote in quotes
                 ]
 
-        bars_list = self.ws_client.ws.get_history(symbols[0])
+        bars_list = self.ws_client.ws.get_recent_trades(symbols[0])
         if assets_is_scalar:
             if len(bars_list) == 0:
                 return np.nan
@@ -273,7 +275,7 @@ class BITMEXBroker(Broker):
             symbols = [asset.symbol for asset in assets]
         timeframe = '1D' if is_daily else '1Min'
 
-        bars_list = self.api_client.Quote.Quote_get(symbols)
+        bars_list = self.ws_client.get_recent_trades(symbols[0])
         bars_map = {a.symbol: a for a in bars_list}
         dfs = []
         for asset in assets if not assets_is_scalar else [assets]:
