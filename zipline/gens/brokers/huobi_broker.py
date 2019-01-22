@@ -5,13 +5,23 @@ import datetime
 import hashlib
 import hmac
 import json
-import urllib
+import urllib.parse
 
 import requests
 from pprint import pprint
 
 # timeout in 5 seconds:
 TIMEOUT = 5
+
+import zipline.protocol as zp
+from zipline.api import symbol as symbol_lookup
+from zipline.errors import SymbolNotFound
+from zipline.finance.order import (Order as ZPOrder,
+                                   ORDER_STATUS as ZP_ORDER_STATUS)
+from zipline.finance.transaction import Transaction
+from zipline.gens.brokers.broker import Broker
+
+URL = 'https://api.hbdm.com'
 
 
 # 各种请求,获取数据方式
@@ -102,12 +112,13 @@ def createSign(pParams, method, host_url, request_path, secret_key):
     return signature
 
 
-class HUOBIBroker:
+class HUOBIBroker(Broker):
 
-    def __init__(self, url, access_key, secret_key):
-        self.__url = url
-        self.__access_key = access_key
-        self.__secret_key = secret_key
+    def __init__(self):
+        self.__url = URL
+
+        self.__access_key = os.environ.get('bitmex_api_key')
+        self.__secret_key = os.environ.get('bitmex_api_secret')
 
     '''
     ======================
@@ -459,13 +470,12 @@ class HUOBIBroker:
 
 if __name__ == '__main__':
     #### input huobi dm url
-    URL = 'https://api.hbdm.com'
 
     ####  input your access_key and secret_key below:
     ACCESS_KEY = os.environ.get('huobi_api_key')
     SECRET_KEY = os.environ.get('huobi_secret_key')
 
-    dm = HuobiDM(URL, ACCESS_KEY, SECRET_KEY)
+    dm = HUOBIBroker()
 
     #### another account:
     # dm2 = HuobiDM(URL, "ANOTHER ACCOUNT's ACCESS_KEY", "ANOTHER ACCOUNT's SECRET_KEY")
@@ -512,7 +522,7 @@ if __name__ == '__main__':
     pprint(dm.get_contract_position_info("BTC"))
 
     sys.exit(0)
-    print(u' 合约下单 ')
+
     pprint(dm.send_contract_order(symbol='', contract_type='', contract_code='BTC181228',
                                   client_order_id='', price=10000, volume=1, direction='sell',
                                   offset='open', lever_rate=5, order_price_type='limit'))
