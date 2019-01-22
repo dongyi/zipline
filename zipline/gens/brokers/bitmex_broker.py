@@ -17,6 +17,8 @@ from zipline.gens.brokers.bitmex_ws_client import BitMEXWebsocket
 TEST_WS_ENTRY = 'wss://testnet.bitmex.com/realtime'
 WS_ENTRY = 'wss://www.bitmex.com/realtime'
 
+from threading import Thread
+
 
 class Account:
     def __init__(self, cash, portfolio_value):
@@ -52,7 +54,8 @@ class BitmexWS:
         self.start_connect()
 
     def start_connect(self):
-        self.ws = BitMEXWebsocket(endpoint=self.endpoint, api_key=self.api_key, api_secret=self.api_secret)
+        self.ws = BitMEXWebsocket(endpoint=self.endpoint, symbol=self.symbol,
+                                  api_key=self.api_key, api_secret=self.api_secret)
 
     def get_recent_trades(self, symbol='XBTUSD'):
         recent_trades = self.ws.recent_trades()
@@ -70,7 +73,7 @@ class BITMEXBroker(Broker):
         self.api_key = os.environ.get('bitmex_api_key')
         self.api_secret = os.environ.get('bitmex_api_secret')
         self.endpoint = TEST_WS_ENTRY if is_test else WS_ENTRY
-        self.ws_client = BitmexWS(symbol='XBTUSD',
+        self.ws_client = BitmexWS(symbol='XBTUSD', endpoint=self.endpoint,
                                   api_key=self.api_key,
                                   api_secret=self.api_secret)
         self.api_client = bitmex.bitmex(is_test, None, self.api_key, self.api_secret)

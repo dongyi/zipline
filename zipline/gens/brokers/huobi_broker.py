@@ -102,7 +102,7 @@ def createSign(pParams, method, host_url, request_path, secret_key):
     return signature
 
 
-class HuobiDM:
+class HUOBIBroker:
 
     def __init__(self, url, access_key, secret_key):
         self.__url = url
