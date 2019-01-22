@@ -10,6 +10,8 @@ import urllib.parse
 import requests
 from pprint import pprint
 
+import pandas as pd
+
 # timeout in 5 seconds:
 TIMEOUT = 5
 
@@ -119,6 +121,95 @@ class HUOBIBroker(Broker):
 
         self.__access_key = os.environ.get('bitmex_api_key')
         self.__secret_key = os.environ.get('bitmex_api_secret')
+        self._orders = {}
+        self._transactions = {}
+        self._subscribed_assets = []
+        super().__init__()
+
+    def get_realtime_bars(self, assets, frequency):
+        if frequency == '1m':
+            resample_freq = '1 Min'
+        elif frequency == '1d':
+            resample_freq = '24 H'
+        else:
+            raise ValueError("Invalid frequency specified: %s" % frequency)
+        df = pd.DataFrame()
+        for asset in assets:
+
+            ohlcv = pd.DataFrame(columns=['open', 'close', 'high', 'low', 'volume'])
+            ohlcv.columns = pd.MultiIndex.from_product([[asset, ], ohlcv.columns])
+            df = pd.concat([df, ohlcv], axis=1)
+
+        return df
+        """
+        for asset in assets:
+            symbol = str(asset.symbol)
+            self.subscribe_to_market_data(asset)
+
+            trade_prices = self._tws.bars[symbol]['last_trade_price']
+            trade_sizes = self._tws.bars[symbol]['last_trade_size']
+            ohlcv = trade_prices.resample(resample_freq).ohlc()
+            ohlcv['volume'] = trade_sizes.resample(resample_freq).sum()
+
+            # Add asset as level 0 column; ohlcv will be used as level 1 cols
+            ohlcv.columns = pd.MultiIndex.from_product([[asset, ],
+                                                        ohlcv.columns])
+
+            df = pd.concat([df, ohlcv], axis=1)
+        """
+        return df
+
+    def get_spot_value(self, assets, field, dt, data_frequency):
+        symbol = str(assets.symbol)
+
+        test_res = {
+            'open': 0.0,
+            'close': 0.0,
+            'high': 0.0,
+            'low': 0.0,
+            'volume': 0.0,
+            'price': 0.0
+        }
+        return test_res[field]
+
+    def get_last_traded_dt(self, asset):
+        return []
+
+    def cancel_order(self, order_param):
+        pass
+
+    def transactions(self):
+        pass
+
+    @property
+    def orders(self):
+        return self._orders
+
+    def order(self, asset, amount, style):
+        pass
+
+    @property
+    def time_skew(self):
+        return 0
+
+    @property
+    def account(self):
+        return None
+
+    @property
+    def portfolio(self):
+        return None
+
+    def subscribe_to_market_data(self, asset):
+        pass
+
+    @property
+    def subscribed_assets(self):
+        return self._subscribed_assets
+
+    @property
+    def positions(self):
+        return []
 
     '''
     ======================
